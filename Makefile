@@ -15,12 +15,6 @@ AR				:= llvm-ar
 # Should we compile in debug
 DEBUG			?= 0
 
-# Should we compile in debug or not
-SPIDIR_DEBUG	?= $(DEBUG)
-
-# The spidir compilation target (given to cargo)
-SPIDIR_TARGET	?= x86_64-unknown-none
-
 # The cflags
 CFLAGS			?=
 
