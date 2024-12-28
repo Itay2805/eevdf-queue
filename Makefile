@@ -69,7 +69,7 @@ test: $(BIN_DIR)/eevdf-queue
 $(BUILD_DIR)/%.c.o: %.c
 	@echo CC $@
 	@mkdir -p $(@D)
-	@$(CC) $(EQ_CFLAGS) -MMD -c $< -o $@
+	@$(CC) $(EQ_CFLAGS) -MMD -MP -c $< -o $@
 
 $(BIN_DIR)/libeevdf-queue.a: $(OBJS)
 	@echo AR $@
