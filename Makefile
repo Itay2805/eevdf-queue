@@ -45,7 +45,7 @@ EQ_CFLAGS		+= -g
 EQ_CFLAGS		+= -Iinclude
 
 # Get the sources along side all of the objects and dependencies
-SRCS 			:= src/eevdf.c
+SRCS 			:= src/linux/rbtree.c src/eevdf.c
 OBJS 			:= $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS 			:= $(OBJS:%.o=%.d)
 
