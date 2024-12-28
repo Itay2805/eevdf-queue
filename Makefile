@@ -53,7 +53,7 @@ TEST_DEPS 		:= $(TEST_OBJS:%.o=%.d)
 default: all
 
 # All the rules
-.PHONY: all
+.PHONY: all test
 all: $(BIN_DIR)/libeevdf-queue.a
 
 test: $(BIN_DIR)/eevdf-queue
@@ -76,7 +76,7 @@ $(BIN_DIR)/libeevdf-queue.a: $(OBJS)
 	@mkdir -p $(@D)
 	@$(AR) rc $@ $^
 
-$(BIN_DIR)/eevdf-queue: $(TEST_OBJS)
+$(BIN_DIR)/eevdf-queue: $(TEST_OBJS) $(BIN_DIR)/libeevdf-queue.a
 	@echo LD $@
 	@mkdir -p $(@D)
 	@$(CC) $(EQ_CFLAGS) $^ -o $@
