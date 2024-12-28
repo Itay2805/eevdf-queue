@@ -1,7 +1,5 @@
 #pragma once
 
-#include "heap.h"
-
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -18,9 +16,6 @@ typedef struct eevdf_queue eevdf_queue_t;
 typedef struct eevdf_node eevdf_node_t;
 
 typedef struct eevdf_node {
-    // the node in the heap this node is in
-    heap_node_t node;
-
     //
     // Configurable by the scheduler
     //
@@ -71,14 +66,6 @@ typedef struct eevdf_queue {
 
     // the currently running node
     eevdf_node_t* current;
-
-    // the heap of eligible nodes, will only have nodes with a
-    // positive lag value and is ordered by the deadlines
-    heap_t eligible;
-
-    // the decaying heaps, we separate it by weights, this allows
-    // us to not touch anything in the order on each tick
-    heap_t decaying[EEVDF_PRIORITY_MAX];
 } eevdf_queue_t;
 
 /**
