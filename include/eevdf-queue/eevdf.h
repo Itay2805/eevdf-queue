@@ -14,7 +14,6 @@ typedef struct eevdf_node {
     // the time slice the node needs/wants (physical time)
     uint32_t time_slice;
 
-    eevdf_queue_t* current_queue;
     struct rb_node timeline_node;
 
     int64_t vdeadline;

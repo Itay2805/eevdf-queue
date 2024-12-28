@@ -114,7 +114,6 @@ void eevdf_queue_add(eevdf_queue_t* queue, eevdf_node_t* node) {
 
     // For now: always insert with a lag of 0.
     node->vruntime = queue->vtime;
-    node->current_queue = queue;
     set_deadline(node);
     enqueue_node(queue, node);
 }
