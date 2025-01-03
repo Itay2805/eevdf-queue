@@ -30,19 +30,36 @@ typedef struct eevdf_queue {
 } eevdf_queue_t;
 
 /**
- * Add a new thread into the queue.
+ * Adds a new thread to the queue. This thread must not be attached to any other
+ * queue.
  *
- * @param queue         [IN] The queue to add to
- * @param node          [IN] The thread that we are adding
+ * @param[in] queue The queue to add to
+ * @param[in] node  The thread to add
  */
 void eevdf_queue_add(eevdf_queue_t* queue, eevdf_node_t* node);
 
 /**
- * Schedule a node to run, will properly handle the current, if the last tick
- * returned NULL then this function should not be called until another thread
- * either wakes up or gets added.
+ * Accounts timing information for the currently-executing thread (as returned
+ * by the last call to this function) and selects a new thread to run.
  *
- * @param queue         [IN] The queue we are scheduling on
- * @param time_slice    [IN] The time since the last time schedule was called
+ * If this function returns null, there are currently no runnable threads, and
+ * that situation will not change until new threads are added (i.e., the
+ * function need not be called again until `eevdf_queue_add` has been called
+ * to insert a new thread).
+ *
+ * If `requeue_curr` is true, the currently-executing thread (if there is
+ * one) will be reinserted into the queue before a new thread is selected. This
+ * is suitable for implementing preemption and similar yield operations, where
+ * the preempted thread is still "ready" to run after being interrupted.
+ *
+ * If `requeue_curr` is false, the current thread will be completely removed
+ * from the queue. This is suitable for implementing thread exit or parking routines.
+ *
+ * @param[in] queue        The queue to reschedule
+ * @param[in] time_slice   The time elapsed since the last call to this function
+ * @param[in] requeue_curr If true, the currently-executing thread will be
+ *                         reinserted into the queue for selection; otherwise,
+ *                         it will be removed
  */
-eevdf_node_t* eevdf_queue_schedule(eevdf_queue_t* queue, int64_t time_slice);
+eevdf_node_t* eevdf_queue_schedule(eevdf_queue_t* queue, int64_t time_slice,
+                                   bool requeue_curr);

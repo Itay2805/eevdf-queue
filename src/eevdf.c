@@ -67,6 +67,49 @@ static void dequeue_node(eevdf_queue_t* queue, eevdf_node_t* node) {
                               &min_vruntime_callbacks);
 }
 
+static void remove_node(eevdf_queue_t* queue, eevdf_node_t* node) {
+    queue->total_weight -= node->weight;
+
+    // To make sure the scheduler never stalls (i.e., no nodes are eligible even
+    // though the queue is nonempty), we need to maintain the invariant that the
+    // lags all sum to 0. We don't want to touch the vruntime of individual
+    // nodes, so we'll do it by warping the global vtime appropriately.
+    //
+    // Recall that lag of node `i` is defined as
+    //
+    //     l_i = w_i * (V - v_i),
+    //
+    // where `w_i` is the node's weight, `V` is the queue vtime and `v_i` is the
+    // node's vruntime. That means that given
+    //
+    //     \Sum_(i=0)^n w_i * (V - v_i) = 0
+    //
+    // and assuming without loss of generality that node `n` is being removed,
+    // we want to find a `V'` such that
+    //
+    //     \Sum_(i=0)^(n-1) w_i * (V' - v_i) = 0.
+    //
+    // Letting
+    //
+    //     W' = \Sum_(i=0)^(n-1) w_i
+    //     V' = V + w_n * (V - v_n) / W'
+    //
+    // we find that
+    //
+    //       \Sum_(i=0)^(n-1) w_i * (V' - v_i) =
+    //     = \Sum_(i=0)^(n-1) w_i * (V + w_n * (V - v_n) / W' - v_i) =
+    //     = \Sum_(i=0)^(n-1) w_i * (V - v_i) + \Sum_(i=0)^(n-1) w_i * w_n * (V - v_n) / W'
+    //     = \Sum_(i=0)^(n-1) w_i * (V - v_i) + W' * w_n * (V - v_n) / W'
+    //     = \Sum_(i=0)^(n-1) w_i * (V - v_i) + w_n * (V - v_n)
+    //     = \Sum_(i=0)^n w_i * (V - v_i)
+    //     = 0,
+    //
+    // which is exactly what we need.
+
+    int64_t lag = node->weight * (queue->vtime - node->vruntime);
+    queue->vtime += lag / queue->total_weight;
+}
+
 static eevdf_node_t* eevdf_queue_pick(eevdf_queue_t* queue) {
     // Optimization: we have easy access to the node with the earliest
     // deadline, and it will be the correct choice if it is eligible. Skip the
@@ -118,7 +161,8 @@ void eevdf_queue_add(eevdf_queue_t* queue, eevdf_node_t* node) {
     enqueue_node(queue, node);
 }
 
-eevdf_node_t* eevdf_queue_schedule(eevdf_queue_t* queue, int64_t time_slice) {
+eevdf_node_t* eevdf_queue_schedule(eevdf_queue_t* queue, int64_t time_slice,
+                                   bool requeue_curr) {
     if (!queue->total_weight) {
         // If nothing is currently running on this queue, our virtual clock is
         // paused and nothing can be selected for execution.
@@ -130,8 +174,12 @@ eevdf_node_t* eevdf_queue_schedule(eevdf_queue_t* queue, int64_t time_slice) {
     eevdf_node_t* current = queue->current;
     if (current) {
         current->vruntime += time_slice / current->weight;
-        set_deadline(current);
-        enqueue_node(queue, current);
+        if (requeue_curr) {
+            set_deadline(current);
+            enqueue_node(queue, current);
+        } else {
+            remove_node(queue, current);
+        }
     }
 
     eevdf_node_t* next = eevdf_queue_pick(queue);
