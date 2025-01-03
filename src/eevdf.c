@@ -5,6 +5,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "utils.h"
+
 #define EEVDF_NODE_OF(node) rb_entry(node, eevdf_node_t, timeline_node)
 #define EEVDF_NODE_OF_SAFE(node)                                               \
     rb_entry_safe(node, eevdf_node_t, timeline_node)
@@ -130,6 +132,9 @@ static eevdf_node_t* pick_node(eevdf_queue_t* queue) {
     // always has at least one eligible node in its subtree.
 
     eevdf_node_t* node = EEVDF_NODE_OF(queue->timeline.rb_root.rb_node);
+    ASSERT(subtree_has_eligible_node(node, queue->vtime),
+           "stall: no eligible nodes in nonempty queue");
+
     while (true) {
         eevdf_node_t* left = EEVDF_NODE_OF_SAFE(node->timeline_node.rb_left);
 
