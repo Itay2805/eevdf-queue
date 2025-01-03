@@ -56,7 +56,7 @@ default: all
 .PHONY: all test
 all: $(BIN_DIR)/libeevdf-queue.a
 
-test: $(BIN_DIR)/eevdf-queue
+test: $(BIN_DIR)/eevdf-queue-test
 
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ $(BIN_DIR)/libeevdf-queue.a: $(OBJS)
 	@mkdir -p $(@D)
 	@$(AR) rc $@ $^
 
-$(BIN_DIR)/eevdf-queue: $(TEST_OBJS) $(BIN_DIR)/libeevdf-queue.a
+$(BIN_DIR)/eevdf-queue-test: $(TEST_OBJS) $(BIN_DIR)/libeevdf-queue.a
 	@echo LD $@
 	@mkdir -p $(@D)
 	@$(CC) $(EQ_CFLAGS) $^ -o $@
