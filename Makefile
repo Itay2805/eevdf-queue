@@ -43,7 +43,7 @@ SRCS 			:= src/linux/rbtree.c src/eevdf.c
 OBJS 			:= $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS 			:= $(OBJS:%.o=%.d)
 
-TEST_SRCS 		:= test/main.c
+TEST_SRCS 		:= test/main.c test/platform.c
 TEST_OBJS 		:= $(TEST_SRCS:%=$(BUILD_DIR)/%.o)
 TEST_DEPS 		:= $(TEST_OBJS:%.o=%.d)
 
