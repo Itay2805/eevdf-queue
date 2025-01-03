@@ -110,7 +110,7 @@ static void remove_node(eevdf_queue_t* queue, eevdf_node_t* node) {
     queue->vtime += lag / queue->total_weight;
 }
 
-static eevdf_node_t* eevdf_queue_pick(eevdf_queue_t* queue) {
+static eevdf_node_t* pick_node(eevdf_queue_t* queue) {
     // Optimization: we have easy access to the node with the earliest
     // deadline, and it will be the correct choice if it is eligible. Skip the
     // tree walk in that case.
@@ -182,7 +182,7 @@ eevdf_node_t* eevdf_queue_schedule(eevdf_queue_t* queue, int64_t time_slice,
         }
     }
 
-    eevdf_node_t* next = eevdf_queue_pick(queue);
+    eevdf_node_t* next = pick_node(queue);
     dequeue_node(queue, next);
     queue->current = next;
 
