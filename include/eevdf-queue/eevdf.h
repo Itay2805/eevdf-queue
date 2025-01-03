@@ -53,7 +53,8 @@ void eevdf_queue_add(eevdf_queue_t* queue, eevdf_node_t* node);
  * the preempted thread is still "ready" to run after being interrupted.
  *
  * If `requeue_curr` is false, the current thread will be completely removed
- * from the queue. This is suitable for implementing thread exit or parking routines.
+ * from the queue. This is suitable for implementing thread exit or parking
+ * routines.
  *
  * @param[in] queue        The queue to reschedule
  * @param[in] time_slice   The time elapsed since the last call to this function
