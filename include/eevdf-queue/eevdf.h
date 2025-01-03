@@ -2,6 +2,7 @@
 
 #include <linux/rbtree.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 typedef struct eevdf_queue eevdf_queue_t;
@@ -24,6 +25,7 @@ typedef struct eevdf_node {
 typedef struct eevdf_queue {
     int64_t vtime;
     uint32_t total_weight;
+    size_t total_nodes;
 
     struct rb_root_cached timeline;
     eevdf_node_t* current;

@@ -68,6 +68,7 @@ static void dequeue_node(eevdf_queue_t* queue, eevdf_node_t* node) {
 }
 
 static void remove_node(eevdf_queue_t* queue, eevdf_node_t* node) {
+    queue->total_nodes--;
     queue->total_weight -= node->weight;
 
     // To make sure the scheduler never stalls (i.e., no nodes are eligible even
@@ -153,6 +154,7 @@ static eevdf_node_t* pick_node(eevdf_queue_t* queue) {
 }
 
 void eevdf_queue_add(eevdf_queue_t* queue, eevdf_node_t* node) {
+    queue->total_nodes++;
     queue->total_weight += node->weight;
 
     // For now: always insert with a lag of 0.
@@ -163,7 +165,7 @@ void eevdf_queue_add(eevdf_queue_t* queue, eevdf_node_t* node) {
 
 eevdf_node_t* eevdf_queue_schedule(eevdf_queue_t* queue, int64_t time_slice,
                                    bool requeue_curr) {
-    if (!queue->total_weight) {
+    if (!queue->total_nodes) {
         // If nothing is currently running on this queue, our virtual clock is
         // paused and nothing can be selected for execution.
         return NULL;
