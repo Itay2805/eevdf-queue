@@ -60,6 +60,7 @@ RB_DECLARE_CALLBACKS(static, min_vruntime_callbacks, eevdf_node_t,
                      timeline_node, min_vruntime, update_min_vruntime);
 
 static void enqueue_node(eevdf_queue_t* queue, eevdf_node_t* node) {
+    node->min_vruntime = node->vruntime;
     rb_add_augmented_cached(&node->timeline_node, &queue->timeline,
                             deadline_before, &min_vruntime_callbacks);
 }
@@ -149,6 +150,8 @@ static eevdf_node_t* pick_node(eevdf_queue_t* queue) {
         if (is_eligible(node, queue->vtime)) {
             break;
         }
+
+        ASSERT(node->timeline_node.rb_right, "broken min_vruntime values in tree");
 
         // Otherwise, all eligible nodes must reside in the right subtree (which
         // must necessarily exist by the loop invariant). Descend there now.
