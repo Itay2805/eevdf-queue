@@ -23,9 +23,21 @@ typedef struct sched_node {
     uint64_t total_runtime;
 } sched_node_t;
 
-static void init_rng(void) {
+static void init_rng(int argc, const char** argv) {
     uint32_t seed = 0;
-    getrandom(&seed, sizeof(seed), 0);
+
+    if (argc > 1) {
+        const char* seed_arg = argv[1];
+        char* seed_arg_end = NULL;
+        seed = strtoul(seed_arg, &seed_arg_end, 0);
+        if (!*seed_arg || *seed_arg_end) {
+            puts("invalid seed argument");
+            exit(1);
+        }
+    } else {
+        getrandom(&seed, sizeof(seed), 0);
+    }
+
     printf("seed: %#x\n", seed);
     srand(seed);
 }
@@ -34,10 +46,10 @@ static int rand_range(int min, int max) {
     return rand() % (max - min) + min;
 }
 
-int main(void) {
+int main(int argc, const char** argv) {
     eevdf_queue_t queue = {0};
 
-    init_rng();
+    init_rng(argc, argv);
 
     size_t n = rand_range(1, MAX_NODES);
     sched_node_t** nodes = calloc(n, sizeof(*nodes));
