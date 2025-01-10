@@ -90,7 +90,6 @@ int main(int argc, const char** argv) {
         }
 
         current = container_of(eevdf_node, sched_node_t, eevdf_node);
-        printf("run %zu for %u\n", current->index, time_slice);
     }
 
     printf("total: runtime = %lu\n", total_runtime);
