@@ -15,7 +15,7 @@
 #define TIME_SLICE_MIN 5000
 #define TIME_SLICE_MAX 50000
 
-#define SCHED_ITERATIONS 20
+#define SCHED_ITERATIONS 100
 
 typedef struct sched_node {
     eevdf_node_t eevdf_node;
